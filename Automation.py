@@ -1,5 +1,6 @@
 
 import re
+import pandas as pd
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -55,18 +56,83 @@ Pages without "2 check ins" removes doesn't seem to duplicate
 """
 
 regex_list = []
+counter = 0
+previous_marker = 0
 
 pdftext_split = pdftext.splitlines()
 
+# Loop is in order by time increasing, and spits out key lines:
+# NEED TO MAKE SURE THAT WE ALWAYS FOLLOW THESE RULES:
+# NEVER PUT A COMMA IN A ROOM NAME OR ROLE NAME, NEVER PUT "Regulars" IN A ROOM NAME OR A ROLE NAME
+
+
 for i in range(len(pdftext_split)):
-    if re.search('\d\d:\d\d[ap]', pdftext_split[i]):
-        regex_list.append((i, re.search('\d\d:\d\d[ap]', pdftext_split[i])))
-    elif re.search('\d:\d\d[ap]', pdftext_split[i]):
-        regex_list.append((i, re.search('\d:\d\d[ap]', pdftext_split[i])))
+
+    text = pdftext_split[i]  # String/text of the individual line
+
+    if text == "":  # If it's blank, skip it
+        continue
+    if re.search('Regulars', text):  # If it has "Regulars", it's an aggregate count row, so skip it
+        counter = 0
+        continue
+    if re.search(' - ', text):  # If it has " - ", it's the title row "Sunday Morning - <date>", therefore skip
+        counter = 0
+        continue
+    if re.search('Check-Ins', text):   # Take's out the "2 Check-Ins" property that we don't want
+        counter = 0
+        continue
+    if re.search('\d\d:\d\d[ap]', text):  # If it has the time, reset the counter, create the time_value to pass on
+        counter = 0
+        time_value = re.search('\d\d:\d\d[ap]', text)
+        time_value = time_value.group(0)
+        # regex_list.append((i, counter, text, time_value))
+    elif re.search('\d:\d\d[ap]', text):  # If it has the time, reset the counter, create the time_value to pass on
+        counter = 0
+        time_value = re.search('\d:\d\d[ap]', text)
+        time_value = time_value.group(0)
+        # regex_list.append((i, counter, text, time_value))
+    elif re.search(',', text):  # If it has a comma, it's a name, so add 2 to the counter (2 elements to match)
+        counter += 2
+        regex_list.append(("Person", counter, text, time_value))
+        previous_marker = 1
+    else:  # Otherwise, simply add one to the counter. Name counter = 2nd value's counter, and 1st values's counter - 1
+        if previous_marker == 1:
+            previous_marker = 0
+            counter = 0
+        counter += 1
+        regex_list.append(["Status", counter, text, time_value])  # Has to be brackets so we can edit later
+        # Problem with a page where there isn't a header, there isn't a clean event break, to start counting by 1's
+        # and then pairing up the attributes with the people.
+        # Potential solution = if the preceeding value had a comma, and this one doesn't, reset the counter
+        # Affirmative - This solved it.
+
+# Taking the attributes and adding 1 to the odd numbers so that they match the person in the join later
+for item in regex_list:
+    if item[0] == 'Status' and item[1] & 1:  # x & 1 -- if True, then number is odd, else false
+        item[0] = 'Room'
+        item[1] += 1
     else:
         continue
 
+# Creating Pandas Dataframe from list
+# http://pbpython.com/pandas-list-dict.html
 
+labels = ['RowType', 'Counter', 'Value', 'Time']
+df = pd.DataFrame.from_records(regex_list, columns=labels)
+
+df_deduped = df.drop_duplicates()  # Can't drop duplicates here... second page people won't get the joins...
+
+# How to subset dataframes in pandas
+# https://chrisalbon.com/python/pandas_index_select_and_filter.html
+df_room = df_deduped[df_deduped['RowType'] == 'Room']
+df_people = df_deduped[df_deduped['RowType'] == 'Person']
+df_status = df_deduped[df_deduped['RowType'] == 'Status']
+
+# Joining dataframes together (like SQL)
+# https://pandas.pydata.org/pandas-docs/stable/comparison_with_sql.html#compare-with-sql-join
+merge_test = pd.merge(df_people, df_room, 'inner', on=['Counter', 'Time'])
+
+merge_test = pd.merge(merge_test, df_status, 'left', on=['Counter', 'Time'])
 
 """ 
 This shows the type of object and LTTextBoxHorizonal had the data I was looking for,
