@@ -21,14 +21,15 @@ def convert_pdf_to_txt(path):
     password = ""
     maxpages = 0
     caching = True
-    pagenos=set()
+    pagenos = set()
     fstr = ''
-    for page in PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,
-                                  caching=caching, check_extractable=True):
+    for pagenumber, page in enumerate(PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,
+                                  caching=caching, check_extractable=True)):
         interpreter.process_page(page)
 
-        str = retstr.getvalue()
-        fstr += str
+        pagetext = retstr.getvalue()
+        fstr += "Python Page:" + str(pagenumber) + " newline \n"  # Enumerate tags the page number
+        fstr += pagetext
 
     fp.close()
     device.close()
@@ -65,7 +66,7 @@ pdftext_split = pdftext.splitlines()
 # NEED TO MAKE SURE THAT WE ALWAYS FOLLOW THESE RULES:
 # NEVER PUT A COMMA IN A ROOM NAME OR ROLE NAME, NEVER PUT "Regulars" IN A ROOM NAME OR A ROLE NAME
 
-
+# Need to add in the page number counter...
 for i in range(len(pdftext_split)):
 
     text = pdftext_split[i]  # String/text of the individual line
@@ -120,13 +121,13 @@ for item in regex_list:
 labels = ['RowType', 'Counter', 'Value', 'Time']
 df = pd.DataFrame.from_records(regex_list, columns=labels)
 
-df_deduped = df.drop_duplicates()  # Can't drop duplicates here... second page people won't get the joins...
+# df_deduped = df.drop_duplicates()  # Can't drop duplicates here... second page people won't get the joins...
 
 # How to subset dataframes in pandas
 # https://chrisalbon.com/python/pandas_index_select_and_filter.html
-df_room = df_deduped[df_deduped['RowType'] == 'Room']
-df_people = df_deduped[df_deduped['RowType'] == 'Person']
-df_status = df_deduped[df_deduped['RowType'] == 'Status']
+df_room = df[df['RowType'] == 'Room']
+df_people = df[df['RowType'] == 'Person']
+df_status = df[df['RowType'] == 'Status']
 
 # Joining dataframes together (like SQL)
 # https://pandas.pydata.org/pandas-docs/stable/comparison_with_sql.html#compare-with-sql-join
