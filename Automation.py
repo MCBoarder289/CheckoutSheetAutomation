@@ -65,8 +65,9 @@ pdftext_split = pdftext.splitlines()
 # Loop is in order by time increasing, and spits out key lines:
 # NEED TO MAKE SURE THAT WE ALWAYS FOLLOW THESE RULES:
 # NEVER PUT A COMMA IN A ROOM NAME OR ROLE NAME, NEVER PUT "Regulars" IN A ROOM NAME OR A ROLE NAME
+# NEVER PUT "Python" or "Python Page:" IN A ROOM NAME OR ROLE NAME
 
-# Need to add in the page number counter...
+# Need to add in the page number counter... *******************************
 for i in range(len(pdftext_split)):
 
     text = pdftext_split[i]  # String/text of the individual line
