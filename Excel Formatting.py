@@ -18,6 +18,9 @@ data = pd.DataFrame({'A': a_list, 'B': b_list})
 df = pd.DataFrame({'Column 1': [1, 2, 3, 4, 5], 'Column 2': ['a', 'b', 'c', 'd', 'e'],
                    'Column 3': ['', '', '', '', '']})
 
+# List Unique Values in a Column #
+times = df['Column 1'].unique()
+
 blank_row = ['', '', '']
 blank_data = []
 # df.loc[0] = ['','','']  # adds a blank row
