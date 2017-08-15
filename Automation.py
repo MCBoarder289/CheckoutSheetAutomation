@@ -187,6 +187,13 @@ merge_test = pd.merge(merge_test, df_status, 'left', on=['Counter', 'Time', 'Pag
 final_df = df_people.merge(df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
 final_df = final_df.merge(df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
+final_df = final_df.filter(items=['Value_x', 'Time', 'Value_y', 'Value'])  # Filter to just these 4 columns
+final_df = final_df.drop_duplicates()
+
+final_df = final_df[final_df['Value'] != 'Volunteer']  # Filter out Volunteers
+
+final_df = final_df.reset_index(drop=True)  # Resetting the row count
+
 final_df.to_excel('rawoutput.xlsx')
 
 """ 
