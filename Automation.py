@@ -165,10 +165,6 @@ for item in regex_list:
 # http://pbpython.com/pandas-list-dict.html
 
 labels = ['RowType', 'Page', 'Change_Property', 'Counter', 'Value', 'Time']
-room_labels = ['Room', 'Page', 'Change_Property', 'Counter', 'Value', 'Time']
-people_labels = ['Name', 'Page', 'Change_Property', 'Counter', 'Value', 'Time']
-status_labels = ['Status', 'Page', 'Change_Property', 'Counter', 'Value', 'Time']
-
 df = pd.DataFrame.from_records(regex_list, columns=labels)
 
 # df.to_excel('outputtest2.xlsx')
@@ -182,20 +178,17 @@ df_room = df[df['RowType'] == 'Room']
 df_people = df[df['RowType'] == 'Person']
 df_status = df[df['RowType'] == 'Status']
 
-df_room.columns = room_labels
-df_status.columns = status_labels
-df_people.columns = people_labels
-
 # Joining dataframes together (like SQL)
 # https://pandas.pydata.org/pandas-docs/stable/comparison_with_sql.html#compare-with-sql-join
 merge_test = pd.merge(df_people, df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
-merge_test = pd.merge(merge_test, df_status['Room'], 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
+merge_test = pd.merge(merge_test, df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
 final_df = df_people.merge(df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
 final_df = final_df.merge(df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
-# df.to_excel('rawoutput.xlsx')
+final_df.to_excel('rawoutput.xlsx')
+
 """ 
 This shows the type of object and LTTextBoxHorizonal had the data I was looking for,
 however there the first person value would also be lumped in with the title value, so we probably need to loop
