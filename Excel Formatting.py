@@ -58,7 +58,7 @@ new_sheet.cell(row=2, column=4).value = 'DUMMY'
 
 # Now do the rest of it. Note the row offset.
 space_counter = 0
-space_number = 10
+space_number = 9
 for row_num in range(2, max_row +1):
     if row_num == 2:
         for col_num in range(1, max_col+1):

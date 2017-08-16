@@ -7,6 +7,9 @@ Mining Checkout PDF and exporting proper file
 
 import re
 import pandas as pd
+import openpyxl
+from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl.styles import Font
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -187,14 +190,90 @@ merge_test = pd.merge(merge_test, df_status, 'left', on=['Counter', 'Time', 'Pag
 final_df = df_people.merge(df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
 final_df = final_df.merge(df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
-final_df = final_df.filter(items=['Value_x', 'Time', 'Value_y', 'Value'])  # Filter to just these 4 columns
+# Filter to just these 4 columns
+final_df = final_df.filter(items=['Value_x', 'Time', 'Value_y', 'Value'])
+# Drop all duplicates
 final_df = final_df.drop_duplicates()
+# Filter out Volunteers
+final_df = final_df[final_df['Value'] != 'Volunteer']
+# Rename Columns
+final_df.columns = ['Name', 'Time', 'Room', 'Status']
+# Add Tab Column
+final_df['Tab'] = final_df['Time'] + ' ' + final_df['Room']
+# Replace Colons in Numbers for Tab Names (bad for tab names in excel)
+final_df['Tab'].replace(to_replace=':', value='', regex=True, inplace=True)
+# Resetting the row count
+final_df = final_df.reset_index(drop=True)
 
-final_df = final_df[final_df['Value'] != 'Volunteer']  # Filter out Volunteers
+# final_df.to_excel('rawoutput.xlsx')
 
-final_df = final_df.reset_index(drop=True)  # Resetting the row count
+# List Unique Values in a Column #
+tabs = final_df['Tab'].unique().tolist()
+tabs_df_list = {}
 
-final_df.to_excel('rawoutput.xlsx')
+for i, tab in enumerate(tabs):
+    df = final_df[final_df['Tab'] == tab]
+    df = df.filter(items=['Name', 'Time', 'Room'])
+    tabs_df_list["{0}".format(tab)] = df
+
+# tabs_df_list['df0']
+
+
+# Excel Work ##########################################
+
+# Need everything bold
+
+wb = openpyxl.Workbook()
+
+for tab in tabs:
+    ws = wb.create_sheet(title=tab)
+    for row in dataframe_to_rows(tabs_df_list[tab], index=False, header=False):
+        ws.append(row)
+
+    # Create new worksheet so we can delete original
+    old_sheet = ws
+    old_sheet.title = 'DELETESHEET'
+    max_row = ws.max_row
+    max_col = ws.max_column
+    wb.create_sheet(tab)
+    new_sheet = wb.get_sheet_by_name(tab)
+
+    space_counter = 0
+    space_number = 9
+    for row_num in range(1, max_row + 1):
+        if row_num == 1:
+            for col_num in range(1, max_col + 1):
+                new_sheet.cell(row=row_num, column=col_num).value = old_sheet.cell(row=row_num, column=col_num).value
+                new_sheet.cell(row=row_num, column=col_num).font = Font(bold=True)
+            space_counter += 1
+        else:
+            for col_num in range(1, max_col + 1):
+                new_sheet.cell(row=row_num + (space_counter * space_number), column=col_num).value = old_sheet.cell(
+                    row=row_num, column=col_num).value
+                new_sheet.cell(row=row_num + (space_counter * space_number), column=col_num).font = Font(bold=True)
+            space_counter += 1
+    delete_sheet = ws  # current ws is the 'DELETESHEET'
+    wb.remove_sheet(ws)  # delete the 'DELETESHEET'
+
+    new_sheet = wb.get_sheet_by_name(tab)
+    dims = {}
+    for row in new_sheet.rows:
+        for cell in row:
+            if cell.value:
+                dims[cell.column] = max((dims.get(cell.column, 0), len(cell.value)))
+    for col, value in dims.items():
+        new_sheet.column_dimensions[col].width = value + 5
+
+# Getting rid of sheet made when we first opened the document
+blank_sheet = wb.get_sheet_by_name('Sheet')
+wb.remove_sheet(blank_sheet)
+
+wb.save("exceltest.xlsx")
+
+
+
+
+
 
 """ 
 This shows the type of object and LTTextBoxHorizonal had the data I was looking for,
