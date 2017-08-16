@@ -239,7 +239,7 @@ for tab in tabs:
     new_sheet = wb.get_sheet_by_name(tab)
 
     space_counter = 0
-    space_number = 9
+    space_number = 8
     for row_num in range(1, max_row + 1):
         if row_num == 1:
             for col_num in range(1, max_col + 1):
