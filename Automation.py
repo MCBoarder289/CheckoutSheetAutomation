@@ -103,7 +103,7 @@ for i in range(len(pdftext_split)):
     if re.search('Regulars', text):  # If it has "Regulars", it's an aggregate count row, so skip it
         # counter = 0
         continue
-    if re.search('Sunday Morning - ', text):  # If it has " - ", it's the title row "Sunday Morning - <date>", therefore skip
+    if re.search('Sunday Morning - ', text):  # It's the title row "Sunday Morning - <date>", therefore skip
         # counter = 0
         continue
     if re.search('Check-Ins', text):   # Take's out the "2 Check-Ins" property that we don't want
