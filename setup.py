@@ -14,7 +14,7 @@ os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 
 build_exe_options = {'include_files': [os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tk86t.dll'),
                                        os.path.join(PYTHON_INSTALL_DIR, 'DLLs', 'tcl86t.dll')],
-                     'packages': ["numpy"]
+                     'packages': ["numpy"]  # numpy was missing as a dependency
                      }
 
 """
