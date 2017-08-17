@@ -16,7 +16,6 @@ Last edited: August 2017
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QLabel, QPushButton,
                              QAction, QFileDialog, QApplication)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QCoreApplication
 import sys
 import Automation
 
