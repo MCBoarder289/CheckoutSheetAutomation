@@ -27,8 +27,8 @@ class Example(QMainWindow):
         self.initUI()
 
     def initUI(self):
-        #self.textEdit = QTextEdit()
-        #self.setCentralWidget(self.textEdit)
+        # self.textEdit = QTextEdit()
+        # self.setCentralWidget(self.textEdit)
         self.statusBar()
 
         self.file_title = QLabel('PDF Location:', self)
