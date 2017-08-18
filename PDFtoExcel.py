@@ -85,7 +85,7 @@ class Example(QMainWindow):
             filename = fname[0]
             self.filename = filename
 
-        return filename
+            return filename
 
     def showDestination(self):
         dname = str(QFileDialog.getExistingDirectory(self, 'Choose Destination', '/home'))
@@ -95,7 +95,7 @@ class Example(QMainWindow):
             self.destination_label.setText(dname)
             destinationname = dname
             self.destinationname = destinationname
-        return destinationname
+            return destinationname
 
     def runAutomation(self):
 
