@@ -73,7 +73,7 @@ class Example(QMainWindow):
         fileMenu.addAction(saveFile)
 
         self.setGeometry(500, 300, 350, 300)
-        self.setWindowTitle('File dialog')
+        self.setWindowTitle('PDFtoExcel - Kids\' roster')
         self.show()
 
     def showFile(self):
