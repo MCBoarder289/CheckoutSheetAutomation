@@ -4,7 +4,6 @@ Mining Checkout PDF and exporting proper file
 
 """
 
-
 import re
 import pandas as pd
 import openpyxl
@@ -18,6 +17,11 @@ from pdfminer.pdfpage import PDFPage
 from io import StringIO
 
 
+"""
+
+PDF Scraping: Takes the filepath of a PDF file, and builds out a string, line by line for each page
+
+"""
 def convert_pdf_to_txt(path):
     # Create variables to make code easier to read
     rsrcmgr = PDFResourceManager()
@@ -34,7 +38,7 @@ def convert_pdf_to_txt(path):
     pagenos = set()
     fstr = ''
     for pagenumber, page in enumerate(PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,
-                                  caching=caching, check_extractable=True)):
+                                                        caching=caching, check_extractable=True)):
         interpreter.process_page(page)
 
         pagetext = retstr.getvalue()
@@ -46,11 +50,18 @@ def convert_pdf_to_txt(path):
     retstr.close()
     return fstr
 
+
 # print(convert_pdf_to_txt("C:\\Users\\Michael Chapman\\Downloads\\Mike Test - Check-Ins Report.pdf"))
+
+"""
+
+Function that takes the raw PDF scraped string and iterates line by line to grab only the relevant information:
+(Person, Attributes about that person like Service Time and Location)
+
+"""
 
 
 def format_pdf_to_excel(fname, dname):
-
     pdftext = convert_pdf_to_txt(fname)
 
     # Returning the regular expression match -- .group(0)
@@ -63,15 +74,16 @@ def format_pdf_to_excel(fname, dname):
     Lines go from upper left of page in columns all the way down until the last name on the page,
     then it goes to the top of the page on the right side and down that column,
     and finally it goes through the middle of the page (2 check ins).
-    
+
     Seems to be doubling the number of pages per single instance of "2 check ins" (2 pages = 4 pages)
-    Pages without "2 check ins" removes doesn't seem to duplicate
-    
+    Pages without "2 check ins" don't seem to duplicate
+
+    counter = The way we count which propery goes with which person. This will reset upon a page change
+
     """
 
     regex_list = []
     counter = 0
-    # previous_marker = 0
     row_type = ""
     previous_row_type = ""
     page = 0
@@ -85,9 +97,8 @@ def format_pdf_to_excel(fname, dname):
     # NEED TO MAKE SURE THAT WE ALWAYS FOLLOW THESE RULES:
     # NEVER PUT A COMMA IN A ROOM NAME OR ROLE NAME, NEVER PUT "Regulars" IN A ROOM NAME OR A ROLE NAME
     # NEVER PUT "Python" or "Python Page:" IN A ROOM NAME OR ROLE NAME
+    # NEVER PUT "Sunday Morning - " IN A ROOM NAME OR ROLE NAME
 
-    # ******** Pages work, but need to make the second page not restart the counter (join/merge causes dupes) **************
-    # Perhaps all we need to do is have a person counter and a Status Counter, and if the page number hasn't changed
     for i in range(len(pdftext_split)):
 
         text = pdftext_split[i]  # String/text of the individual line
@@ -96,9 +107,7 @@ def format_pdf_to_excel(fname, dname):
             page = re.search('\d{1,}', text)  # Pulls out the number of the page (can be multiple digits)
             page = int(page.group(0))
             counter = 0
-            previous_page = page - 1
             change_count = 0
-            person_count = 0
             row_type = ''
             previous_row_type = ''
             continue
@@ -110,7 +119,7 @@ def format_pdf_to_excel(fname, dname):
         if re.search('Sunday Morning - ', text):  # It's the title row "Sunday Morning - <date>", therefore skip
             # counter = 0
             continue
-        if re.search('Check-Ins', text):   # Take's out the "2 Check-Ins" property that we don't want
+        if re.search('Check-Ins', text):  # Take's out the "2 Check-Ins" property that we don't want
             # counter = 0
             continue
         if re.search('\d\d:\d\d[ap]', text):  # If it has the time, reset the counter, create the time_value to pass on
@@ -126,7 +135,7 @@ def format_pdf_to_excel(fname, dname):
         elif re.search(',', text):  # If it has a comma, it's a name, so add 2 to the counter (2 elements to match)
             row_type = "Person"
             if previous_row_type == "Status":  # previous_marker == 0:  # If the preceeding element was a Status and not a person,
-                counter = 0                       #  reset the counter (new page)
+                counter = 0  # reset the counter (new page)
                 change_count += 1
 
             if change_count > 1:
@@ -142,7 +151,7 @@ def format_pdf_to_excel(fname, dname):
             if previous_row_type != row_type:
                 previous_row_type = "Status"
                 change_count += 1
-                # previous_marker = 0
+
                 if change_count > 1:
                     change_count = 0
                     change_property += 1
@@ -152,13 +161,13 @@ def format_pdf_to_excel(fname, dname):
 
                 regex_list.append(["Status", page, change_property, counter, text, time_value])
             else:
-                # counter = 0
                 counter += 1
-                regex_list.append(["Status", page, change_property, counter, text, time_value])  # Has to be brackets so we can edit later
-            # Problem with a page where there isn't a header, there isn't a clean event break, to start counting by 1's
-            # and then pairing up the attributes with the people.
-            # Potential solution = if the preceeding value had a comma, and this one doesn't, reset the counter
-            # Affirmative - This solved it.
+                regex_list.append(["Status", page, change_property, counter, text,
+                                   time_value])  # Has to be brackets so we can edit later
+                # Problem with a page where there isn't a header, there isn't a clean event break, to start counting by 1's
+                # and then pairing up the attributes with the people.
+                # Potential solution = if the preceding value had a comma, and this one doesn't, reset the counter
+                # Affirmative - This solved it.
 
     # Taking the attributes and adding 1 to the odd numbers so that they match the person in the join later
     for item in regex_list:
@@ -176,7 +185,6 @@ def format_pdf_to_excel(fname, dname):
 
     # df.to_excel('outputtest2.xlsx')
 
-
     # df_deduped = df.drop_duplicates()  # Can't drop duplicates here... second page people won't get the joins...
 
     # How to subset dataframes in pandas
@@ -187,9 +195,9 @@ def format_pdf_to_excel(fname, dname):
 
     # Joining dataframes together (like SQL)
     # https://pandas.pydata.org/pandas-docs/stable/comparison_with_sql.html#compare-with-sql-join
-    merge_test = pd.merge(df_people, df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
+    # merge_test = pd.merge(df_people, df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
-    merge_test = pd.merge(merge_test, df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
+    # merge_test = pd.merge(merge_test, df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
 
     final_df = df_people.merge(df_room, 'inner', on=['Counter', 'Time', 'Page', 'Change_Property'])
     final_df = final_df.merge(df_status, 'left', on=['Counter', 'Time', 'Page', 'Change_Property'])
@@ -215,6 +223,8 @@ def format_pdf_to_excel(fname, dname):
     tabs = final_df['Tab'].unique().tolist()
     tabs_df_list = {}
 
+    # Loop through each tab, and create a list of dataframes for each tab to be then added into the excel workbook
+
     for i, tab in enumerate(tabs):
         df = final_df[final_df['Tab'] == tab]
         df = df.filter(items=['Name', 'Time', 'Room'])
@@ -225,32 +235,33 @@ def format_pdf_to_excel(fname, dname):
 
     # Excel Work ##########################################
 
-    # Need everything bold
+    wb = openpyxl.Workbook()  # Open a workbook in memory
 
-    wb = openpyxl.Workbook()
-
-    for tab in tabs:
+    for tab in tabs:  # Loop through the list of tabs and create placeholder tabs
         ws = wb.create_sheet(title=tab)
         for row in dataframe_to_rows(tabs_df_list[tab], index=False, header=False):
-            ws.append(row)
+            ws.append(row)  # For every row in the dataframe, add a row to the current worksheet/tab
 
+        # For each tab, need to create a separate duplicate tab, so we can form the spaces between
         # Create new worksheet so we can delete original
         old_sheet = ws
         old_sheet.title = 'DELETESHEET'
         max_row = ws.max_row
         max_col = ws.max_column
-        wb.create_sheet(tab)
+        wb.create_sheet(tab)  # Can rename the new sheet to the old sheets name now because it's different
         new_sheet = wb.get_sheet_by_name(tab)
 
-        space_counter = 0
-        space_number = 8
+        space_counter = 0  # Essential the original row count, need to multiply it for the spaces to get proper spot
+        space_number = 8  # Number of spaces to add
+
         for row_num in range(1, max_row + 1):
-            if row_num == 1:
+            if row_num == 1:  # For the first row, we want it on the first row, no need to add spaces.
                 for col_num in range(1, max_col + 1):
-                    new_sheet.cell(row=row_num, column=col_num).value = old_sheet.cell(row=row_num, column=col_num).value
+                    new_sheet.cell(row=row_num, column=col_num).value = old_sheet.cell(row=row_num,
+                                                                                       column=col_num).value
                     new_sheet.cell(row=row_num, column=col_num).font = Font(bold=True)
                 space_counter += 1
-            else:
+            else:  # For all other rows, we need to multiply the original row by the space number
                 for col_num in range(1, max_col + 1):
                     new_sheet.cell(row=row_num + (space_counter * space_number), column=col_num).value = old_sheet.cell(
                         row=row_num, column=col_num).value
@@ -259,6 +270,7 @@ def format_pdf_to_excel(fname, dname):
         delete_sheet = ws  # current ws is the 'DELETESHEET'
         wb.remove_sheet(ws)  # delete the 'DELETESHEET'
 
+        # Formatting the excel, making sure the column width is a little bit more than the max that we calculate
         new_sheet = wb.get_sheet_by_name(tab)
         dims = {}
         for row in new_sheet.rows:
@@ -272,16 +284,17 @@ def format_pdf_to_excel(fname, dname):
     blank_sheet = wb.get_sheet_by_name('Sheet')
     wb.remove_sheet(blank_sheet)
 
-    date = datetime.datetime.now().strftime("%Y%m%d")
+    date = datetime.datetime.now().strftime("%Y%m%d")  # Grabbing date to append to the title
 
+    # Saving the excel sheet at the destination path, with the date appended to it
     wb.save(dname + "/" + date + " Kids Sheet.xlsx")
 
 
+"""
+
+Old code trying to use the PDF object types, but the line-by-line scraping works fine:
 
 
-
-
-""" 
 This shows the type of object and LTTextBoxHorizonal had the data I was looking for,
 however there the first person value would also be lumped in with the title value, so we probably need to loop
 line by line like before
