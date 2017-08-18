@@ -15,7 +15,7 @@ Last edited: August 2017
 
 from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QLabel, QPushButton,
                              QAction, QFileDialog, QApplication)
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import (QIcon, QFont)
 import sys
 import Automation
 
@@ -32,12 +32,17 @@ class Example(QMainWindow):
         self.statusBar()
 
         self.file_title = QLabel('PDF Location:', self)
+        font = QFont()
+        font.setBold(True)
+        font.setUnderline(True)
+        self.file_title.setFont(font)
         self.file_title.move(15, 30)
 
         self.file_label = QLabel('', self)
         self.file_label.move(15, 40)
 
         self.destination_title = QLabel('Ending Location:', self)
+        self.destination_title.setFont(font)
         self.destination_title.move(15, 80)
 
         self.destination_label = QLabel('', self)
