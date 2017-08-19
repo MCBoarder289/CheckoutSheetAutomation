@@ -34,16 +34,20 @@ class Example(QMainWindow):
         font.setBold(True)  # Setting the font variable to bold
         font.setUnderline(True)  # Underlining the title font variable
         self.file_title.setFont(font)  # Setting the title object font
+        self.file_title.resize(400, 20)  # Resizing the labels
         self.file_title.move(15, 30)  # Placing the position in the window
 
         self.file_label = QLabel('', self)  # Placeholder for File Selection
+        self.file_label.resize(400, 20)
         self.file_label.move(15, 40)
 
         self.destination_title = QLabel('Ending Location:', self)  # Title above selected destination location
         self.destination_title.setFont(font)  # Copying bold/underline font for title here
+        self.destination_title.resize(400, 20)
         self.destination_title.move(15, 80)
 
         self.destination_label = QLabel('', self)   # Placeholder for Destination Selection
+        self.destination_title.resize(400, 20)
         self.destination_label.move(15, 90)
 
         self.filename = None

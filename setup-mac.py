@@ -5,10 +5,14 @@
 # Went and found the Python.Framework in my usr/local/Cellar directory
 # Pasted that in the /Library/Frameworks directory
 # Had to get the site-packages directory from Cellar and put them in the Library/Framewords/Python.framework folder
-# Had to find the QT frame works located in /usr/local/lib/python3.6/site-packages/PyQt5/Qt/lib...
+# Had to find the QT frameworks located in /usr/local/lib/python3.6/site-packages/PyQt5/Qt/lib...
 # Then manually copied those in /usr/local/Cellar/python3/3.6.2/Frameworks/Python.framework/Versions/3.6/lib
 # Still get strange error on not having QtGamepad.framework, which won't create standalone .app
 # but the executable will open a console window, then the window we need, so it's at least testable/manageable
+
+# To get around the opening of the terminal window, deliver the whole build folder, and then create an AppleScript
+# that saves as an application. See the site below:
+# http://brizzled.clapper.org/blog/2008/10/22/wrapping-an-executable-inside-a-mac-os-x-application/
 
 import sys
 from cx_Freeze import setup, Executable
