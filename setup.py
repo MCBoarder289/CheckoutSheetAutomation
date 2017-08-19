@@ -1,5 +1,5 @@
 # How To: https://cx-freeze.readthedocs.io/en/latest/distutils.html
-# From CMD: python setup.py build
+# From CMD: cd to the project directory, and then enter: python setup.py build
 
 import sys
 from cx_Freeze import setup, Executable
