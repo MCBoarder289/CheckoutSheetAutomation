@@ -72,7 +72,7 @@ class Example(QMainWindow):
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
 
-        self.setGeometry(500, 300, 350, 300)  # Sets size of the window
+        self.setGeometry(500, 300, 450, 300)  # Sets size of the window
         self.setWindowTitle('PDFtoExcel - Kids\' roster')
         self.show()
 
