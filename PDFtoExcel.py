@@ -105,7 +105,7 @@ class Example(QMainWindow):
 
         if self.filename and self.destinationname:  # If we have both a file and destination, run the script with those
             Automation.format_pdf_to_excel(fname=self.filename, dname=self.destinationname)
-            sys.exit(app.exec_())  # Exit the app after it is run
+            # sys.exit(app.exec_())  # Exit the app after it is run  # Comment this out to avoid exit error on Mac
 
 
 if __name__ == '__main__':
