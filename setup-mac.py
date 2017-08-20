@@ -14,6 +14,10 @@
 # that saves as an application. See the site below:
 # http://brizzled.clapper.org/blog/2008/10/22/wrapping-an-executable-inside-a-mac-os-x-application/
 
+# Also had to manually create the MySQL directory opt/lib....etc from an error we were getting (just renamed the
+# .dylib from 20 to 18 to remove the error). Also needed to copy/paste/rename the postgres sql.dylib to the right spot
+# to supress another error. Still have an error at the end, but I have a running Application that hopefully can work
+
 import sys
 from cx_Freeze import setup, Executable
 import os.path
@@ -26,9 +30,6 @@ import os.path
 # MySQL driver has issues...
 # http://jwintz.me/blog/2016/02/15/fixing-the-qt-mysql-driver-on-macosx-10-dot-11/
 
-# Also had to manually create the MySQL directory opt/lib....etc from an error we were getting (just renamed the
-# .dylib from 20 to 18 to remove the error). Also needed to copy/paste/rename the postgres sql.dylib to the right spot
-# to supress another error. Still have an error at the end, but I have a running Application that hopefully can work
 
 # Dependencies are automatically detected, but it might need fine tuning.
 
