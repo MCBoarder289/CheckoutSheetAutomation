@@ -19,10 +19,12 @@ from cx_Freeze import setup, Executable
 import os.path
 
 # tcl library key error: https://stackoverflow.com/questions/35533803/keyerror-tcl-library-when-i-use-cx-freeze
-PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
-os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
-os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
+# PYTHON_INSTALL_DIR = os.path.dirname(os.path.dirname(os.__file__))
+# os.environ['TCL_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tcl8.6')
+# os.environ['TK_LIBRARY'] = os.path.join(PYTHON_INSTALL_DIR, 'tcl', 'tk8.6')
 # os.environ['PYQT5_LIBRARY'] = '/usr/local/lib/python3.6/site-packages/PyQt5'
+# MySQL driver has issues...
+# http://jwintz.me/blog/2016/02/15/fixing-the-qt-mysql-driver-on-macosx-10-dot-11/
 
 # Dependencies are automatically detected, but it might need fine tuning.
 
