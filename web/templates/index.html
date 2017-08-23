@@ -1,8 +1,12 @@
 {% extends "layout.html" %}
 {% block body %}
-  <h1>Upload new File</h1>
+  <h1>Convert PDF</h1>
+
     <form method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
+      <fieldset>
+        <input type="file" name="file" id="file" class="inputfile" />
+        <br />
+        <input class="button-primary" type="submit" value="Upload">
+      </fieldset>
     </form>
 {% endblock %}
