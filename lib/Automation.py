@@ -7,7 +7,6 @@ Mining Checkout PDF and exporting proper file
 import re
 import pandas as pd
 import openpyxl
-import datetime
 from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.styles import Font
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -61,7 +60,7 @@ Function that takes the raw PDF scraped string and iterates line by line to grab
 """
 
 
-def format_pdf_to_excel(fname, dname):
+def format_pdf_to_excel(fname):
     pdftext = convert_pdf_to_txt(fname)
 
     # Returning the regular expression match -- .group(0)
@@ -284,10 +283,7 @@ def format_pdf_to_excel(fname, dname):
     blank_sheet = wb.get_sheet_by_name('Sheet')
     wb.remove_sheet(blank_sheet)
 
-    date = datetime.datetime.now().strftime("%Y%m%d")  # Grabbing date to append to the title
-
-    # Saving the excel sheet at the destination path, with the date appended to it
-    wb.save(dname + "/" + date + " Kids Sheet.xlsx")
+    return wb
 
 
 """
