@@ -103,11 +103,15 @@ class Example(QMainWindow):
     def runAutomation(self):
 
         if self.filename and self.destinationname:  # If we have both a file and destination, run the script with those
-            workbook = Automation.format_pdf_to_excel(fname=self.filename)
+            fp = open(self.filename, 'rb')
+            try:
+                workbook = Automation.format_pdf_to_excel(fp)
 
-            date = datetime.datetime.now().strftime("%Y%m%d")  # Grabbing date to append to the title
-            # Saving the excel sheet at the destination path, with the date appended to it
-            workbook.save(self.destinationname + "/" + date + " Kids Sheet.xlsx")
+                date = datetime.datetime.now().strftime("%Y%m%d")  # Grabbing date to append to the title
+                # Saving the excel sheet at the destination path, with the date appended to it
+                workbook.save(self.destinationname + "/" + date + " Kids Sheet.xlsx")
+            finally:
+                fp.close()
 
             sys.exit(app.exec_())  # Exit the app after it is run
 

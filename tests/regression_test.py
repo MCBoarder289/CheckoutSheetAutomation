@@ -17,8 +17,10 @@ class RegressionTest(unittest.TestCase):
         logging.propagate = False
         logging.getLogger().setLevel(logging.ERROR)
 
-        result = Automation.format_pdf_to_excel(TEST_INPUT_FILENAME)
+        test_file = open(TEST_INPUT_FILENAME, 'rb')
+        result = Automation.format_pdf_to_excel(test_file)
         result = result.active
+        test_file.close()
 
         expected_workbook = openpyxl.load_workbook(EXPECTED_OUTPUT_FILENAME)
         expected_workbook = expected_workbook.active

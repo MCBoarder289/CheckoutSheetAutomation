@@ -5,50 +5,13 @@ Mining Checkout PDF and exporting proper file
 """
 
 import re
-import pandas as pd
+
 import openpyxl
-from openpyxl.utils.dataframe import dataframe_to_rows
+import pandas as pd
 from openpyxl.styles import Font
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import TextConverter
-from pdfminer.layout import LAParams
-from pdfminer.pdfpage import PDFPage
-from io import StringIO
+from openpyxl.utils.dataframe import dataframe_to_rows
 
-
-"""
-
-PDF Scraping: Takes the filepath of a PDF file, and builds out a string, line by line for each page
-
-"""
-def convert_pdf_to_txt(path):
-    # Create variables to make code easier to read
-    rsrcmgr = PDFResourceManager()
-    retstr = StringIO()
-    codec = 'utf-8'
-    laparams = LAParams()
-    device = TextConverter(rsrcmgr, retstr, codec=codec, laparams=laparams)
-    # Open the file, begin to interpret the PDF
-    fp = open(path, 'rb')  # file(path, 'rb')  # file() was Python 2.x, open is Python 3.x
-    interpreter = PDFPageInterpreter(rsrcmgr, device)
-    password = ""
-    maxpages = 0
-    caching = True
-    pagenos = set()
-    fstr = ''
-    for pagenumber, page in enumerate(PDFPage.get_pages(fp, pagenos, maxpages=maxpages, password=password,
-                                                        caching=caching, check_extractable=True)):
-        interpreter.process_page(page)
-
-        pagetext = retstr.getvalue()
-        fstr += "Python Page:" + str(pagenumber) + " newline \n"  # Enumerate tags the page number
-        fstr += pagetext
-
-    fp.close()
-    device.close()
-    retstr.close()
-    return fstr
-
+from lib.PdfScraper import PdfScraper
 
 # print(convert_pdf_to_txt("C:\\Users\\Michael Chapman\\Downloads\\Mike Test - Check-Ins Report.pdf"))
 
@@ -60,8 +23,8 @@ Function that takes the raw PDF scraped string and iterates line by line to grab
 """
 
 
-def format_pdf_to_excel(fname):
-    pdftext = convert_pdf_to_txt(fname)
+def format_pdf_to_excel(input_file):
+    pdftext = PdfScraper().convert_pdf_to_txt(input_file)
 
     # Returning the regular expression match -- .group(0)
     # https://stackoverflow.com/questions/18493677/how-do-i-return-a-string-from-a-regex-match-in-python
@@ -324,5 +287,3 @@ device.close()
 retstr.close()
 
 """
-
-
