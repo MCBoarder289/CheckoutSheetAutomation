@@ -19,13 +19,12 @@ class RegressionTest(unittest.TestCase):
 
         test_file = open(TEST_INPUT_FILENAME, 'rb')
         result = Automation.format_pdf_to_excel(test_file)
-        result = result.active
         test_file.close()
 
         expected_workbook = openpyxl.load_workbook(EXPECTED_OUTPUT_FILENAME)
-        expected_workbook = expected_workbook.active
 
-        for (col, col_1) in zip(result.iter_cols(), expected_workbook.iter_cols()):
-            for (cell, cell_1) in zip(col, col_1):
-                # print(str(cell.value) + ' : ' + str(cell_1.value) + ' @ ' + str(cell.coordinate))
-                self.assertEquals(str(cell.value), str(cell_1.value))
+        for (sheet, sheet_1) in zip(result.worksheets, expected_workbook.worksheets):
+            for (col, col_1) in zip(sheet.iter_cols(), sheet_1.iter_cols()):
+                for (cell, cell_1) in zip(col, col_1):
+                    print(str(cell.value) + ' : ' + str(cell_1.value) + ' @ ' + str(cell.coordinate))
+                    self.assertEquals(str(cell.value), str(cell_1.value))
