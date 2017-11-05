@@ -21,7 +21,7 @@ def build_workbook(tabs, tabs_df_list):
         new_sheet = wb.get_sheet_by_name(tab)
 
         space_counter = 0  # Essential the original row count, need to multiply it for the spaces to get proper spot
-        space_number = 8  # Number of spaces to add
+        space_number = 12  # Number of spaces to add (originally 8)
 
         for row_num in range(1, max_row + 1):
             if row_num == 1:  # For the first row, we want it on the first row, no need to add spaces.
