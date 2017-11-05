@@ -45,7 +45,7 @@ and finally it goes through the middle of the page (2 check ins).
 Seems to be doubling the number of pages per single instance of "2 check ins" (2 pages = 4 pages)
 Pages without "2 check ins" don't seem to duplicate
 
-counter = The way we count which propery goes with which person. This will reset upon a page change
+counter = The way we count which property goes with which person. This will reset upon a page change
 
 """
 
