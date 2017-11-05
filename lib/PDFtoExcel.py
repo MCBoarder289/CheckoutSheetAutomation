@@ -12,11 +12,14 @@ Website: zetcode.com
 Last edited: August 2017
 """
 
+import datetime
+import sys
+
+from PyQt5.QtGui import (QIcon, QFont)
 from PyQt5.QtWidgets import (QMainWindow, QLabel, QPushButton,
                              QAction, QFileDialog, QApplication)
-from PyQt5.QtGui import (QIcon, QFont)
-import sys
-import Automation
+
+from lib import Automation
 
 
 class Example(QMainWindow):
@@ -100,7 +103,16 @@ class Example(QMainWindow):
     def runAutomation(self):
 
         if self.filename and self.destinationname:  # If we have both a file and destination, run the script with those
-            Automation.format_pdf_to_excel(fname=self.filename, dname=self.destinationname)
+            fp = open(self.filename, 'rb')
+            try:
+                workbook = Automation.format_pdf_to_excel(fp)
+
+                date = datetime.datetime.now().strftime("%Y%m%d")  # Grabbing date to append to the title
+                # Saving the excel sheet at the destination path, with the date appended to it
+                workbook.save(self.destinationname + "/" + date + " Kids Sheet.xlsx")
+            finally:
+                fp.close()
+
             sys.exit(app.exec_())  # Exit the app after it is run
 
 
