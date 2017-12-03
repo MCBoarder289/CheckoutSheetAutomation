@@ -46,3 +46,7 @@ def upload_file():
     return Response(save_virtual_workbook(wb),
                     mimetype=EXCEL_MIMETYPE,
                     headers={"Content-Disposition": "attachment;filename=" + build_filename()})
+
+# Include the code below to allow it to run on a local host (test the app in a browser)
+# if __name__ == '__main__':
+    # app.run()
