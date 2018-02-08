@@ -8,6 +8,7 @@ from lib import Automation
 
 TEST_INPUT_FILENAME = os.path.join(os.path.dirname(__file__), 'test-input.pdf')
 EXPECTED_OUTPUT_FILENAME = os.path.join(os.path.dirname(__file__), 'expected-output.xlsx')
+# TODO  -- Need to update the test case. It fails because we changed the space sizing form 8 to 11 spaces
 
 
 class RegressionTest(unittest.TestCase):
